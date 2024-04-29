@@ -11,7 +11,3 @@ def product_page(request):
     return render(request, 'store/product.html', context)
 
 
-def cart(request):
-    context = {}
-    return render(request, 'store/cart.html', context)
-
