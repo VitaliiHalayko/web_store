@@ -4,7 +4,7 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='static/assets/images/categories/')
     desc = models.CharField(max_length=100, default='Describe your category')

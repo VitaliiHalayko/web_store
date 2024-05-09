@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Categories
+from .models import Category
 
 def categories(request):
-    content = Categories.objects.all()
+    content = Category.objects.all()
     return render(request, 'categories/categories.html', {'categories': content})
