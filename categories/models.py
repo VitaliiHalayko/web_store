@@ -7,6 +7,7 @@ import sys
 class Categories(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='static/assets/images/categories/')
+    desc = models.CharField(max_length=100, default='Describe your category')
     is_visible = models.BooleanField(default=True)
     sort_order = models.SmallIntegerField()
 
