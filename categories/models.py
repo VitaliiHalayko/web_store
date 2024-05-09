@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 
 class Category(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     image = models.ImageField(upload_to='static/assets/images/categories/')
     desc = models.CharField(max_length=100, default='Describe your category')
     is_visible = models.BooleanField(default=True)
@@ -15,8 +15,8 @@ class Category(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        width = 230
-        height = 130
+        width = 450
+        height = 300
 
         img = Image.open(self.image)
         output = BytesIO()
@@ -42,7 +42,7 @@ class Category(models.Model):
 
         self.image = InMemoryUploadedFile(output, 'ImageField', "%s.jpg" % self.image.name.split('.')[0], 'image/jpeg', sys.getsizeof(output), None)
 
-        super(Categories, self).save(*args, **kwargs)
+        super(Category, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['sort_order']
