@@ -47,12 +47,13 @@
                             <!-- Category actions-->
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                                 <div class="text-center"><a class="btn btn-outline-dark mt-auto"
-                                                            href="{% url 'shop' el.name %}">Переглянути
+                                                            href="{% url 'category_products' el.name %}">Переглянути
                                     товари</a></div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
+        </div>
         </div>
     </section>
 {% endblock %}
