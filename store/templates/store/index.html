@@ -28,38 +28,115 @@
 
 {% block content %}
     <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                {% for el in products %}
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img class="card-img-top" style="width: 95%; margin: 2.5%" src="{{ el.image.url }}" alt="..."/>
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder">{{ el.name }}</h5>
-                                    <!-- Product price-->
-                                    {{ el.desc }}
-                                    {% if el.price_with_discount < el.price %}
-                                        <span class="text-muted text-decoration-line-through">₴{{ el.price }}</span>
-                                        ₴{{ el.price_with_discount }}
-                                    {% else %}
-                                        ₴{{ el.price }}
-                                    {% endif %}
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <!-- Фильтр слева -->
+                <div class="col-lg-2 d-flex flex-column justify-content-between">
+                    <div class="card mb-4 flex-grow-1">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="sortOptions" class="form-label">Сортувати за:</label>
+                                <select class="form-select" id="sortOptions">
+                                    <option value="price_asc">Ціною (за зростанням)</option>
+                                    <option value="price_desc">Ціною (за спаданням)</option>
+                                    <option value="name_asc">Назвою (за алфавітом)</option>
+                                    <option value="name_desc">Назвою (за зворотнім алфавітом)</option>
+                                    <!-- Добавьте другие параметры сортировки по желанию -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <h5 class="card-title pt-3">Ціна:</h5>
+                                <input type="range" class="form-range" min="{{ min_price }}" max="{{ max_price }}"
+                                       id="priceRangeFrom" value="{{ min_price }}">
+                                <input type="range" class="form-range" min="{{ min_price }}" max="{{ max_price }}"
+                                       id="priceRangeTo" value="{{ max_price }}">
+                                <label for="priceRangeFrom" class="form-label">Ціна: від <span
+                                        id="priceRangeFromValue">{{ min_price }}</span> до <span
+                                        id="priceRangeToValue">{{ max_price }}</span></label>
+                            </div>
+
+                            {% for attribute, values in attributes_dict.items %}
+                                <h5 class="card-title pt-3">{{ attribute.name }}</h5>
+                                <div class="form-check">
+                                    {% for value in values %}
+                                        <input class="form-check-input" type="checkbox" value="{{ value.value }}">
+                                        <label class="form-check-label" for="{{ value.value }}">
+                                            {{ value.value }}
+                                        </label>
+                                        <br>
+                                    {% endfor %}
                                 </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto"
-                                                            href="{% url 'product' el.name %}">Переглянути
-                                    товар</a></div>
-                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer d-flex justify-content-center">
+                            <button type="button" class="btn btn-primary w-50">Пошук</button>
                         </div>
                     </div>
-                {% endfor %}
-        </div>
+                </div>
+
+                <!-- Основное содержимое с карточками товаров справа -->
+                <div class="col-lg-7">
+                    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                        {% for el in products %}
+                            <div class="col mb-5">
+                                <div class="card h-100">
+                                    <!-- Product image-->
+                                    <img class="card-img-top" style="width: 95%; margin: 2.5%" src="{{ el.image.url }}"
+                                         alt="..."/>
+                                    <!-- Product details-->
+                                    <div class="card-body p-4">
+                                        <div class="text-center">
+                                            <!-- Product name-->
+                                            <h5 class="fw-bolder">{{ el.name }}</h5>
+                                            <!-- Product price-->
+                                            {{ el.desc }}
+                                            {% if el.price_with_discount < el.price %}
+                                                <span class="text-muted text-decoration-line-through">₴{{ el.price }}</span>
+                                                ₴{{ el.price_with_discount }}
+                                            {% else %}
+                                                ₴{{ el.price }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- Product actions-->
+                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center"><a class="btn btn-outline-dark mt-auto"
+                                                                    href="{% url 'product' el.name %}">Переглянути
+                                            товар</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
+
+    <script>
+        var priceRangeFrom = document.getElementById('priceRangeFrom');
+        var priceRangeFromValue = document.getElementById('priceRangeFromValue');
+        var priceRangeTo = document.getElementById('priceRangeTo');
+        var priceRangeToValue = document.getElementById('priceRangeToValue');
+
+        priceRangeFrom.addEventListener('input', function () {
+            if (parseInt(priceRangeFrom.value) > parseInt(priceRangeTo.value)) {
+                priceRangeFrom.value = priceRangeTo.value;
+                priceRangeFromValue.textContent = priceRangeTo.value;
+            } else {
+                priceRangeFromValue.textContent = priceRangeFrom.value;
+            }
+        });
+
+        priceRangeTo.addEventListener('input', function () {
+            if (parseInt(priceRangeTo.value) < parseInt(priceRangeFrom.value)) {
+                priceRangeTo.value = priceRangeFrom.value;
+                priceRangeToValue.textContent = priceRangeFrom.value;
+            } else {
+                priceRangeToValue.textContent = priceRangeTo.value;
+            }
+        });
+    </script>
+
 {% endblock %}
