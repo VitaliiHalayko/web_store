@@ -7,7 +7,7 @@ class AttributeAdmin(admin.ModelAdmin):
 
 
 class ValueAdmin(admin.ModelAdmin):
-    exclude = ['name_for_admin_page']
+    exclude = ['name_for_admin_page', 'selected']
 
 
 admin.site.register(Product)
