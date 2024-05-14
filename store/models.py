@@ -58,16 +58,11 @@ class Product(models.Model):
 
 class Attribute(models.Model):
     name = models.CharField(max_length=50)
-    name_for_admin_page = models.CharField(max_length=50, default='attribute name at admin page')
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     is_show = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name_for_admin_page
-
-    def save(self, *args, **kwargs):
-        self.name_for_admin_page = f"{self.name} - {self.category.name}"
-        super().save(*args, **kwargs)
+        return f"{self.category.name} - {self.name}"
 
     class Meta:
         verbose_name = 'Атрибут товару'
@@ -79,15 +74,10 @@ class Value(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
-    name_for_admin_page = models.CharField(max_length=150, default='product value at admin page')
     selected = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name_for_admin_page
-
-    def save(self, *args, **kwargs):
-        self.name_for_admin_page = f"{self.product.name} - {self.category.name} - {self.value}"
-        super().save(*args, **kwargs)
+        return f"{self.category.name} - {self.attribute.name} - {self.product.name} - {self.value}"
 
     class Meta:
         verbose_name = 'Значення для атрибуту товару'

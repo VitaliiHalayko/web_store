@@ -50,7 +50,8 @@
 
                                 <div class="card-footer d-flex justify-content-center bg-transparent mt-4">
                                     <input type="submit" class="btn btn-primary w-50" value="Пошук">
-                                    <a class="btn btn-secondary w-50 ms-2" href="{% url 'category_products' current_category %}">
+                                    <a class="btn btn-secondary w-50 ms-2"
+                                       href="{% url 'category_products' current_category %}">
 
                                         Скинути
                                     </a>
@@ -63,10 +64,12 @@
                                     <input type="range" class="form-range" min="{{ min_price }}" max="{{ max_price }}"
                                            id="priceRangeTo" value="{{ max_price }}">
                                     <label for="priceRangeFrom" class="form-label">Ціна: від <span
-                                            id="priceRangeFromValue">{{ min_price }}</span> до <span
-                                            id="priceRangeToValue">{{ max_price }}</span></label>
-                                    <input type="hidden" name="min_price" id="minPriceHidden" value="{{ min_price }}">
-                                    <input type="hidden" name="max_price" id="maxPriceHidden" value="{{ max_price }}">
+                                            id="priceRangeFromValue">{{ current_min_price }}</span> до <span
+                                            id="priceRangeToValue">{{ current_max_price }}</span></label>
+                                    <input type="hidden" name="min_price" id="minPriceHidden"
+                                           value="{{ current_min_price }}">
+                                    <input type="hidden" name="max_price" id="maxPriceHidden"
+                                           value="{{ current_max_price }}">
                                 </div>
 
                                 {% for attribute, values in attributes_dict.items %}
@@ -167,6 +170,32 @@
                 priceRangeToValue.textContent = priceRangeTo.value;
                 maxPriceHidden.value = priceRangeTo.value;
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceRangeFrom = document.getElementById('priceRangeFrom');
+            const priceRangeTo = document.getElementById('priceRangeTo');
+            const priceRangeFromValue = document.getElementById('priceRangeFromValue');
+            const priceRangeToValue = document.getElementById('priceRangeToValue');
+            const minPriceHidden = document.getElementById('minPriceHidden');
+            const maxPriceHidden = document.getElementById('maxPriceHidden');
+
+            // Set initial values
+            priceRangeFrom.value = minPriceHidden.value;
+            priceRangeTo.value = maxPriceHidden.value;
+            priceRangeFromValue.textContent = minPriceHidden.value;
+            priceRangeToValue.textContent = maxPriceHidden.value;
+
+            // Update hidden inputs and labels when sliders change
+            priceRangeFrom.addEventListener('input', function () {
+                minPriceHidden.value = priceRangeFrom.value;
+                priceRangeFromValue.textContent = priceRangeFrom.value;
+            });
+
+            priceRangeTo.addEventListener('input', function () {
+                maxPriceHidden.value = priceRangeTo.value;
+                priceRangeToValue.textContent = priceRangeTo.value;
+            });
         });
     </script>
 
