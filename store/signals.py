@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Product
 import os
 
+
 @receiver(post_delete, sender=Product)
 def delete_image(sender, instance, **kwargs):
     if instance.image:
