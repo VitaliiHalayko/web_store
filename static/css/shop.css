@@ -1,0 +1,8 @@
+.path_link {
+    text-decoration: none;
+    color: #2c3034
+}
+
+.path_link:hover {
+    color: #ff4040;
+}
