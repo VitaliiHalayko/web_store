@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'store',
     'categories',
+    'about',
     'shopping_cart',
 ]
 
