@@ -23,9 +23,10 @@
     {% bootstrap_javascript %}
 
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet"/>
-    <link href="{% static 'css/cart.css' %}" rel="stylesheet"/>
-    <link href="{% static 'css/product.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/product.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/shop.css' %}"/>
 </head>
 <body style="height: 100%;">
 <!-- Navigation-->
@@ -36,11 +37,15 @@
                 class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" aria-current="page"
+                <li class="nav-item"><a class="nav-link {% if active == 'shop' %}active{% endif %}"
                                         href="{% url 'categories' %}">Shop</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Popular Items</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">New Arrivals</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item"><a class="nav-link {% if active == 'popular' %}active{% endif %}"
+                                        href="{% url 'popular' %}">Popular Items</a></li>
+                <li class="nav-item"><a class="nav-link {% if active == 'new' %}active{% endif %}"
+                                        href="{% url 'new' %}">New Arrivals</a></li>
+                <li class="nav-item"><a class="nav-link {% if active == 'about' %}active{% endif %}"
+                                        href="#">About</a>
+                </li>
             </ul>
             <form class="d-flex">
                 <a class="btn btn-outline-dark" href="{% url 'cart' %}">

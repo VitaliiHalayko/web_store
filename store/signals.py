@@ -1,7 +1,7 @@
-from django.db.models.signals import post_delete, pre_save  # Importing signals for model events
-from django.dispatch import receiver  # Importing receiver decorator to link signals to functions
-from .models import Product  # Importing the Product model
-import os  # Importing os module to handle file operations
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from .models import Product
+import os
 
 
 @receiver(post_delete, sender=Product)

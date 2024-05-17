@@ -11,7 +11,38 @@ def index(request):
     Fetches all products and renders the homepage with the list of products.
     """
     products = Product.objects.all()
-    return render(request, 'store/index.html', {'products': products})
+    return render(request, 'store/index.html', {
+        'active': 'shop',
+        'products': products
+    })
+
+
+def popular_items(request):
+    """
+    View function for the most popular products
+
+    :param request: request from user
+    :return: view of the most popular products
+    """
+    products = Product.objects.order_by('-total_orders_count')[:20]
+    return render(request, 'store/index.html', {
+        'active': 'popular',
+        'is_filter_show': False,
+        'path_url': 'popular',
+        'path_name': 'Popular Items',
+        'products': products
+    })
+
+
+def new_arrivals(request):
+    products = Product.objects.order_by('-updated_on')[:20]
+    return render(request, 'store/index.html', {
+        'active': 'new',
+        'is_filter_show': False,
+        'path_url': 'new',
+        'path_name': 'New Arrivals',
+        'products': products
+    })
 
 
 def get_filtered_products(data, category):
@@ -97,6 +128,8 @@ def category_products(request, category_name):
     attributes_dict = get_attributes_dict(attributes, request.POST)
 
     return render(request, 'store/index.html', {
+        'active': 'shop',
+        'is_filter_show': True,
         'min_price': min_price,
         'max_price': max_price,
         'current_min_price': current_min_price,
@@ -107,11 +140,22 @@ def category_products(request, category_name):
     })
 
 
-def product_page(request, product_name):
+def product_page(request, category_name, product_name):
     """
     View function for displaying a single product page.
 
     Fetches the product by name and renders the product detail page.
     """
+    category = Category.objects.get(name=category_name)
+    same_products = Product.objects.filter(category=category)[:4]
+
     product = Product.objects.get(name=product_name)
-    return render(request, 'store/product.html', {'product': product})
+
+    values = Value.objects.filter(product=product)
+    return render(request, 'store/product.html', {
+        'active': 'shop',
+        'current_category': category_name,
+        'product': product,
+        'details': values,
+        'same_products': same_products
+    })
