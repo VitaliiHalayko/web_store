@@ -4,6 +4,8 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 
+
+# Model representing a products categories
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     image = models.ImageField(upload_to='static/assets/images/about/')
@@ -48,4 +50,3 @@ class Category(models.Model):
         ordering = ['sort_order']
         verbose_name = 'Категорія'
         verbose_name_plural = 'Категорії'
-
