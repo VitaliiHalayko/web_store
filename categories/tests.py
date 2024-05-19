@@ -4,6 +4,7 @@ from .models import Category
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 import io
+import os
 
 
 class CategoriesViewTests(TestCase):
@@ -37,6 +38,14 @@ class CategoriesViewTests(TestCase):
             is_visible=True,
             sort_order=2
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        for category in Category.objects.all():
+            if category.image and 'test_image' in category.image.name:
+                if os.path.isfile(category.image.path):
+                    os.remove(category.image.path)
+        super().tearDownClass()
 
     def test_categories_page_status_code(self):
         """
@@ -79,3 +88,110 @@ class CategoriesViewTests(TestCase):
         self.assertEqual(category.desc, 'Description 1')
         self.assertTrue(category.is_visible)
         self.assertEqual(category.sort_order, 1)
+
+
+class CategoryModelTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create an image in memory
+        image = Image.new('RGB', (600, 400), color='blue')
+        image_file = io.BytesIO()
+        image.save(image_file, format='JPEG')
+        image_file.seek(0)
+
+        # Create SimpleUploadedFile object
+        cls.uploaded_image = SimpleUploadedFile(
+            name='test_image.jpg',
+            content=image_file.read(),
+            content_type='image/jpeg'
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        for category in Category.objects.all():
+            if category.image and 'test_image' in category.image.name:
+                if os.path.isfile(category.image.path):
+                    os.remove(category.image.path)
+        super().tearDownClass()
+
+    def test_create_category(self):
+        """
+        Testing the creation of a category object
+        """
+        category = Category.objects.create(
+            name='Test Category',
+            image=self.uploaded_image,
+            desc='Test Description',
+            is_visible=True,
+            sort_order=1
+        )
+        self.assertEqual(category.name, 'Test Category')
+        self.assertEqual(category.desc, 'Test Description')
+        self.assertTrue(category.is_visible)
+        self.assertEqual(category.sort_order, 1)
+
+    def test_image_processing_on_save(self):
+        """
+        Testing image processing when saving
+        """
+        category = Category.objects.create(
+            name='Test Category',
+            image=self.uploaded_image,
+            desc='Test Description',
+            is_visible=True,
+            sort_order=1
+        )
+
+        img_path = category.image.path
+        img = Image.open(img_path)
+
+        self.assertEqual(img.size, (450, 300))
+        self.assertTrue(img.format, 'JPEG')
+
+    def test_image_aspect_ratio(self):
+        """
+        Test changing the image proportions
+        """
+        image = Image.new('RGB', (800, 200), color='green')
+        image_file = io.BytesIO()
+        image.save(image_file, format='JPEG')
+        image_file.seek(0)
+
+        uploaded_image = SimpleUploadedFile(
+            name='test_image_wide.jpg',
+            content=image_file.read(),
+            content_type='image/jpeg'
+        )
+
+        category = Category.objects.create(
+            name='Test Category Wide',
+            image=uploaded_image,
+            desc='Test Description Wide',
+            is_visible=True,
+            sort_order=1
+        )
+
+        img_path = category.image.path
+        img = Image.open(img_path)
+
+        self.assertEqual(img.size, (450, 300))
+        self.assertTrue(img.format, 'JPEG')
+
+    def test_image_cleanup(self):
+        """
+        Test deleting test images after the tests
+        """
+        category = Category.objects.create(
+            name='Test Category Cleanup',
+            image=self.uploaded_image,
+            desc='Test Description Cleanup',
+            is_visible=True,
+            sort_order=1
+        )
+
+        img_path = category.image.path
+        self.assertTrue(os.path.isfile(img_path))
+
+        Category.objects.all().delete()
+
+        self.assertFalse(os.path.isfile(img_path))
