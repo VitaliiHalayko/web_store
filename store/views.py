@@ -4,19 +4,6 @@ from categories.models import Category
 from store.models import Product, Value, Attribute
 
 
-def index(request):
-    """
-    View function for the homepage.
-
-    Fetches all products and renders the homepage with the list of products.
-    """
-    products = Product.objects.all()
-    return render(request, 'store/index.html', {
-        'active': 'shop',
-        'products': products
-    })
-
-
 def popular_items(request):
     """
     View function for the most popular products
