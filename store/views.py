@@ -2,6 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q, Min, Max
 from categories.models import Category
 from store.models import Product, Value, Attribute
+from django.contrib import messages
+from shopping_cart.models import CartItem
+
+
 
 
 def popular_items(request):
