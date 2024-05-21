@@ -6,8 +6,6 @@ from django.contrib import messages
 from shopping_cart.models import CartItem
 
 
-
-
 def popular_items(request):
     """
     View function for the most popular products

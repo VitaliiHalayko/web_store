@@ -27,7 +27,57 @@ def add_to_cart(request, product_id, quantity):
     # Перенаправлення назад на ту ж сторінку
     return redirect(request.META.get('HTTP_REFERER', 'cart'))
 
+def del_from_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    session_key = request.session.session_key
+
+    CartItem.objects.filter(session_key=session_key, product=product).delete()
+    items = CartItem.objects.filter(session_key=session_key)
+
+    # Перенаправлення назад на ту ж сторінку
+    return render(request, 'shopping_cart/cart.html', context={
+        'items': items,
+        'count': len(items),
+        'totalSumWithoutSales': sum(items)[0],
+        'totalSumWithSales': sum(items)[1]
+    })
+
+
+def change_quantity(request, product_id, quantity):
+    product = get_object_or_404(Product, id=product_id)
+    session_key = request.session.session_key
+    CartItem.objects.filter(session_key=session_key, product=product).update(quantity=quantity)
+    items = CartItem.objects.filter(session_key=session_key)
+
+    return render(request, 'shopping_cart/cart.html', context={
+        'items': items,
+        'count': len(items),
+        'totalSumWithoutSales': sum(items)[0],
+        'totalSumWithSales': sum(items)[1]
+    })
+
+def create_order(request):
+    pass
+
+def sum(items):
+    totalSumWithoutSales = 0
+    totalSumWithSales = 0
+
+    for item in items:
+        totalSumWithoutSales += item.product.price * item.quantity
+        if item.product.price_with_discount < item.product.price:
+            totalSumWithSales += item.product.price_with_discount * item.quantity
+        else:
+            totalSumWithSales += item.product.price * item.quantity
+
+    return totalSumWithoutSales, totalSumWithSales
 
 def cart(request):
-    content = {}
-    return render(request, 'shopping_cart/cart.html', content)
+    items = CartItem.objects.filter(session_key=request.session.session_key)
+
+    return render(request, 'shopping_cart/cart.html', context={
+        'items': items,
+        'count': len(items),
+        'totalSumWithoutSales': sum(items)[0],
+        'totalSumWithSales': sum(items)[1]
+    })
