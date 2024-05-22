@@ -7,6 +7,31 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+</style>
+
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <section class="h-100 h-custom">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -32,7 +57,8 @@
                                         </div>
                                         <div class="col-md-3 col-lg-3 col-xl-3">
                                             <h6 class="text-muted">{{ item.product.category }}</h6>
-                                            <a class="text-black mb-0" href="{% url 'product' item.product.category.name item.product.name %}">{{ item.product }}</a>
+                                            <a class="text-black mb-0"
+                                               href="{% url 'product' item.product.category.name item.product.name %}">{{item.product}}</a>
                                         </div>
                                         <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
                                             <button type="button"
@@ -116,15 +142,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-3" style="margin-bottom: 10px">
-                                        <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="form3Examplea2">Введіть ваше
-                                                по-батькові</label>
-                                            <input type="text" id="optionalName"
-                                                   class="form-control form-control-lg"/>
-                                        </div>
-                                    </div>
-
                                     <div class="mb-3" style="margin-bottom: 0px">
                                         <div data-mdb-input-init class="form-outline">
                                             <label class="form-label" for="form3Examplea2">Введіть ваш email</label>
@@ -166,9 +183,11 @@
                                         <h5>₴{{totalSumWithSales}}</h5>
                                     </div>
 
-                                    <button type="button" data-mdb-button-init data-mdb-ripple-init
+                                    <button type="button"
+                                            id="createOrderButton"
                                             class="btn btn-dark btn-block btn-lg"
-                                            data-mdb-ripple-color="dark">Замовити
+                                            onclick="createOrder(event, '{{ items|escapejs }}')">
+                                        Замовити
                                     </button>
 
                                 </div>
@@ -204,11 +223,34 @@
         if (quantity < 1) quantity = 1;
         document.getElementById('inputQuantity' + product_id).value = quantity;
 
-        var url = "{% url 'change_quantity' 0 0 %}".replace('0/0', product_id + '/' + quantity);
-
         document.getElementById('decrementButton' + product_id).href = url;
 
         window.location.href = url;
+    }
+
+    function createOrder(event, items, amount) {
+        event.preventDefault(); // Запобігає переходу за посиланням
+        var lastName = document.getElementById('lastName').value;
+        var firstName = document.getElementById('firstName').value;
+        var email = document.getElementById('email').value;
+        var city = document.getElementById('city').value;
+        var address = document.getElementById('address').value;
+        var postal = document.getElementById('postal').value;
+
+        var urlTemplate = "{% url 'create_order' 0 0 0 0 0 0 %}";
+        var url = urlTemplate.replace('0/0/0/0/0/0', lastName + '/' + firstName + '/' + email + '/' + city + '/' + address + '/' + postal);
+
+        window.location.href = url;
+
+        document.getElementById('lastName').value = "";
+        document.getElementById('firstName').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('city').value = "";
+        document.getElementById('address').value = "";
+        document.getElementById('postal').value = "";
+
+
+
     }
 </script>
 
