@@ -23,7 +23,7 @@ class Order(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'Order {self.id}'
+        return f'{self.first_name, self.last_name, self.email, self.created.date()}'
 
 
 class OrderItem(models.Model):
