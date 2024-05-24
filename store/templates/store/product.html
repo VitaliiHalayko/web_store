@@ -1,0 +1,179 @@
+{% extends 'store/layout.html' %}
+{% load static %}
+
+{% block title %}Product Page{% endblock %}
+
+{% block content %}
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+</style>
+
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="py-4 text-center" style="font-size: 18px; color: #2c3034">
+    <a href="{% url 'categories' %}" class="path_link"><i class="fa-solid fa-house"></i></a> /
+    <a href="{% url 'category_products' product.category.name %}" class="path_link">{{ product.category.name }}</a>
+    / {{ product.name }}
+</section>
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6 text-center">
+                <img class="card-img-top mb-5 mb-md-0 d-block mx-auto"
+                     style="max-height: 350px; width: auto; max-width: 600px"
+                     src="{{ product.image_on_shop_page.url }}" alt="...">
+            </div>
+
+            <div class="col-md-6">
+                <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
+                <div class="fs-5 mb-5">
+                    {% if product.price_with_discount < product.price %}
+                    <span class="text-muted text-decoration-line-through">₴{{ product.price }}</span>
+                    ₴{{ product.price_with_discount }}
+                    {% else %}
+                    ₴{{ product.price }}
+                    {% endif %}
+                </div>
+                <p class="lead">{{ product.short_description }}</p>
+                <div class="d-flex">
+                    <div class="input-group me-3">
+                        <button class="btn btn-outline-dark" type="button" onclick="decrementValue()">-</button>
+                        <input class="form-control text-center" id="inputQuantity" type="number" value="1"
+                               style="max-width: 5rem"/>
+                        <button class="btn btn-outline-dark" type="button" onclick="incrementValue()">+</button>
+                    </div>
+                    <a id="addToCartLink" class="btn btn-outline-dark flex-shrink-0" onclick="addToCart(event)"
+                       href="#">
+                        <i class="bi-cart-fill me-1"></i>
+                        Add to cart
+                    </a>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Description and characteristics section -->
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <!-- Description -->
+            <div class="col-md-5">
+                <h2 class="fw-bolder">Опис</h2>
+                <p class="text-muted">{{ product.description }}</p>
+            </div>
+            <!-- Characteristics -->
+            <div class="col-md-7">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2 class="fw-bolder mb-4">Характеристики</h2>
+                        <ul class="list-group">
+                            {% for el in details %}
+                            <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+                                <span>{{ el.attribute.name }}:</span>
+                                <span class="badge bg-secondary">{{ el.value }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Related items section-->
+<section class="py-5 bg-light">
+    <div class="container px-4 px-lg-5 mt-5">
+        <h2 class="fw-bolder mb-4">Related products</h2>
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for el in same_products %}
+            <div class="col mb-5">
+                <div class="card h-100">
+                    <!-- Product image-->
+                    <img class="card-img-top" style="width: 95%; margin: 2.5%" src="{{ el.image.url }}"
+                         alt="..."/>
+                    <!-- Product details-->
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            <!-- Product name-->
+                            <h5 class="fw-bolder">{{ el.name }}</h5>
+                            <!-- Product price-->
+                            {{ el.desc }}
+                            {% if el.price_with_discount < el.price %}
+                            <span class="text-muted text-decoration-line-through">₴{{ el.price }}</span>
+                            ₴{{ el.price_with_discount }}
+                            {% else %}
+                            ₴{{ el.price }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!-- Product actions-->
+                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="text-center"><a class="btn btn-outline-dark mt-auto"
+                                                    href="{% url 'product' current_category el.name %}">Переглянути
+                            товар</a></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    function incrementValue() {
+        var value = parseInt(document.getElementById('inputQuantity').value, 10);
+        value = isNaN(value) ? 1 : value;
+        value++;
+        document.getElementById('inputQuantity').value = value;
+    }
+
+    function decrementValue() {
+        var value = parseInt(document.getElementById('inputQuantity').value, 10);
+        value = isNaN(value) ? 1 : value;
+        value--;
+        if (value < 1) value = 1;
+        document.getElementById('inputQuantity').value = value;
+    }
+
+    function addToCart(event) {
+        event.preventDefault(); // Запобігає переходу за посиланням
+
+        // Отримуємо значення з поля введення
+        var quantity = parseInt(document.getElementById('inputQuantity').value);
+        var productId = {{ product.id }}; // Припустимо, що у вас є змінна product у шаблоні
+
+        // Створюємо новий URL
+        var url = "{% url 'add_to_cart' 0 0 %}".replace('0/0', productId + '/' + quantity);
+
+        // Змінюємо атрибут href тега <a>
+        document.getElementById('addToCartLink').href = url;
+
+        // Перенаправляємо користувача за новим URL
+        window.location.href = url;
+    }
+</script>
+
+{% endblock %}

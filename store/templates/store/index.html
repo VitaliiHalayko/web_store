@@ -1,0 +1,216 @@
+{% extends 'store/layout.html' %}
+{% load static %}
+
+{% block title %}Shop page{% endblock %}
+
+{% block header %}
+    <header class="bg-dark py-1">
+        <div class="container px-4 px-lg-5 my-0">
+            <div class="text-center text-white">
+                <div class="container" style="max-width: 1400px; margin: 0 auto; overflow: hidden;">
+                    <div class="slides" style="display: none; height: 400px;">
+                        <img src="{% static 'assets/images/swiper_images/1.png' %}" alt="Slide 1"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="slides" style="display: none; height: 400px;">
+                        <img src="{% static 'assets/images/swiper_images/2.jpg' %}" alt="Slide 2"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="slides" style="display: none; height: 400px;">
+                        <img src="{% static 'assets/images/swiper_images/3.jpg' %}" alt="Slide 3"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block content %}
+    <section class="py-4 text-center" style="font-size: 18px; color: #2c3034">
+        {% if current_category %}
+            <a href="{% url 'categories' %}" class="path_link"><i class="fa-solid fa-house"></i></a> / {{ current_category }}
+        {% else %}
+            <a href="{% url path_url %}" class="path_link"><i class="fa-solid fa-house"></i></a> / {{ path_name }}
+        {% endif %}
+    </section>
+    <section class="py-0">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <!-- Filter -->
+                {% if is_filter_show %}
+                    <div class="col-lg-2 d-flex flex-column justify-content-between">
+                        <div class="card mb-4 flex-grow-1">
+                            <div class="card-body">
+                                <form id="attributesFrom" method="post"
+                                      action="{% url 'category_products' current_category %}">
+                                    {% csrf_token %}
+
+                                    <div class="mb-3">
+                                        <label for="sortOptions" class="form-label">Сортувати за:</label>
+                                        <select class="form-select" id="sortOptions" name="sort_option">
+                                            <option value="price_asc">Ціною (за зростанням)</option>
+                                            <option value="price_desc">Ціною (за спаданням)</option>
+                                            <option value="name_asc">Назвою (A - Я)</option>
+                                            <option value="name_desc">Назвою (Я - А)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="card-footer d-flex justify-content-center bg-transparent mt-4">
+                                        <input type="submit" class="btn btn-primary w-50" value="Пошук">
+                                        <a class="btn btn-secondary w-50 ms-2"
+                                           href="{% url 'category_products' current_category %}">
+
+                                            Скинути
+                                        </a>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h5 class="card-title pt-3">Ціна:</h5>
+                                        <input type="range" class="form-range" min="{{ min_price }}"
+                                               max="{{ max_price }}"
+                                               id="priceRangeFrom" value="{{ min_price }}">
+                                        <input type="range" class="form-range" min="{{ min_price }}"
+                                               max="{{ max_price }}"
+                                               id="priceRangeTo" value="{{ max_price }}">
+                                        <label for="priceRangeFrom" class="form-label">Ціна: від <span
+                                                id="priceRangeFromValue">{{ current_min_price }}</span> до <span
+                                                id="priceRangeToValue">{{ current_max_price }}</span></label>
+                                        <input type="hidden" name="min_price" id="minPriceHidden"
+                                               value="{{ current_min_price }}">
+                                        <input type="hidden" name="max_price" id="maxPriceHidden"
+                                               value="{{ current_max_price }}">
+                                    </div>
+
+                                    {% for attribute, values in attributes_dict.items %}
+                                        <div class="form-group">
+                                            <h5 class="card-title pt-3"
+                                                id="attribute_{{ attribute }}">{{ attribute }}</h5>
+                                            <div class="form-check">
+                                                {% for value in values %}
+                                                    <input class="form-check-input" type="checkbox"
+                                                           value="{{ value.value }}"
+                                                           id="value_{{ value.id }}" name="{{ attribute }}"
+                                                            {% if value.selected %} checked {% endif %}>
+                                                    <!-- Устанавливаем checked если value.selected равно True -->
+                                                    <label class="form-check-label" for="value_{{ value.id }}">
+                                                        {{ value.value }}
+                                                    </label>
+                                                    <br>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+
+                                    <div class="card-footer d-flex justify-content-center bg-transparent mt-4">
+                                        <input type="submit" class="btn btn-primary w-50" value="Пошук">
+                                        <button type="button" class="btn btn-secondary w-50 ms-2" onclick="resetForm()">
+                                            Скинути
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- ecommerce -->
+                <div class="col-lg-7">
+                    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                        {% for el in products %}
+                            <div class="col mb-5">
+                                <div class="card h-100">
+                                    <!-- Product image-->
+                                    <img class="card-img-top" style="width: 95%; margin: 2.5%" src="{{ el.image.url }}"
+                                         alt="..."/>
+                                    <!-- Product details-->
+                                    <div class="card-body p-4">
+                                        <div class="text-center">
+                                            <!-- Product name-->
+                                            <h5 class="fw-bolder">{{ el.name }}</h5>
+                                            <!-- Product price-->
+                                            {{ el.desc }}
+                                            {% if el.price_with_discount < el.price %}
+                                                <span class="text-muted text-decoration-line-through">₴{{ el.price }}</span>
+                                                ₴{{ el.price_with_discount }}
+                                            {% else %}
+                                                ₴{{ el.price }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- Product actions-->
+                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center"><a class="btn btn-outline-dark mt-auto"
+                                                                    href="{% url 'product' el.category.name el.name %}">Переглянути
+                                            товар</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if is_filter_show %}
+        <script>
+            var priceRangeFrom = document.getElementById('priceRangeFrom');
+            var priceRangeFromValue = document.getElementById('priceRangeFromValue');
+            var priceRangeTo = document.getElementById('priceRangeTo');
+            var priceRangeToValue = document.getElementById('priceRangeToValue');
+            var minPriceHidden = document.getElementById('minPriceHidden');
+            var maxPriceHidden = document.getElementById('maxPriceHidden');
+
+            priceRangeFrom.addEventListener('input', function () {
+                if (parseInt(priceRangeFrom.value) > parseInt(priceRangeTo.value)) {
+                    priceRangeFrom.value = priceRangeTo.value;
+                    priceRangeFromValue.textContent = priceRangeTo.value;
+                    maxPriceHidden.value = priceRangeTo.value;
+                } else {
+                    priceRangeFromValue.textContent = priceRangeFrom.value;
+                    minPriceHidden.value = priceRangeFrom.value;
+                }
+            });
+
+            priceRangeTo.addEventListener('input', function () {
+                if (parseInt(priceRangeTo.value) < parseInt(priceRangeFrom.value)) {
+                    priceRangeTo.value = priceRangeFrom.value;
+                    priceRangeToValue.textContent = priceRangeFrom.value;
+                    minPriceHidden.value = priceRangeFrom.value;
+                } else {
+                    priceRangeToValue.textContent = priceRangeTo.value;
+                    maxPriceHidden.value = priceRangeTo.value;
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const priceRangeFrom = document.getElementById('priceRangeFrom');
+                const priceRangeTo = document.getElementById('priceRangeTo');
+                const priceRangeFromValue = document.getElementById('priceRangeFromValue');
+                const priceRangeToValue = document.getElementById('priceRangeToValue');
+                const minPriceHidden = document.getElementById('minPriceHidden');
+                const maxPriceHidden = document.getElementById('maxPriceHidden');
+
+                // Set initial values
+                priceRangeFrom.value = minPriceHidden.value;
+                priceRangeTo.value = maxPriceHidden.value;
+                priceRangeFromValue.textContent = minPriceHidden.value;
+                priceRangeToValue.textContent = maxPriceHidden.value;
+
+                // Update hidden inputs and labels when sliders change
+                priceRangeFrom.addEventListener('input', function () {
+                    minPriceHidden.value = priceRangeFrom.value;
+                    priceRangeFromValue.textContent = priceRangeFrom.value;
+                });
+
+                priceRangeTo.addEventListener('input', function () {
+                    maxPriceHidden.value = priceRangeTo.value;
+                    priceRangeToValue.textContent = priceRangeTo.value;
+                });
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}
