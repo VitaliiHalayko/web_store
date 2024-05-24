@@ -48,7 +48,9 @@ def del_from_cart(request, product_id):
 def change_quantity(request, product_id, quantity):
     product = get_object_or_404(Product, id=product_id)
     session_key = request.session.session_key
-    CartItem.objects.filter(session_key=session_key, product=product).update(quantity=quantity)
+
+    if quantity > 0:
+        CartItem.objects.filter(session_key=session_key, product=product).update(quantity=quantity)
     items = CartItem.objects.filter(session_key=session_key)
 
     return render(request, 'shopping_cart/cart.html', context={

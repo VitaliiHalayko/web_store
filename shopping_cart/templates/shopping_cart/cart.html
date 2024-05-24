@@ -223,6 +223,8 @@
         if (quantity < 1) quantity = 1;
         document.getElementById('inputQuantity' + product_id).value = quantity;
 
+        var url = "{% url 'change_quantity' 0 0 %}".replace('0/0', product_id + '/' + quantity);
+
         document.getElementById('decrementButton' + product_id).href = url;
 
         window.location.href = url;
