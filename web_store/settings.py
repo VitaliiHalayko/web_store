@@ -37,7 +37,9 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOST = os.environ.get('ALLOWED_HOSTS', '*')
+
+ALLOWED_HOSTS = [ALLOWED_HOST]
 
 
 # Application definition
